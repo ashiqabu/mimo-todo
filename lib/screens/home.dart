@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lottie/lottie.dart';
 import 'package:todo_list/core/constant.dart';
 import 'package:todo_list/screens/profile.dart';
+import 'package:todo_list/screens/tasks.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,11 +21,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     loadTodos();
   }
 
-  
   void loadTodos() {
     FirebaseFirestore.instance
         .collection('myTodos')
@@ -35,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
- 
   void createTodo() {
     DocumentReference documentReference =
         FirebaseFirestore.instance.collection('myTodos').doc(title);
@@ -143,49 +143,74 @@ class _HomeScreenState extends State<HomeScreen> {
                       .collection('myTodos')
                       .snapshots(),
                   builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return const Center(child: Text('no Data'));
-                    } else if (snapshot.hasData || snapshot.data != null) {
-                      return GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 8.0,
-                          mainAxisSpacing: 8.0,
-                          childAspectRatio: 1.2,
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return const Center(child: Text('Error fetching data'));
+                    } else if (!snapshot.hasData ||
+                        snapshot.data!.docs.isEmpty) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 49),
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 4),
+                              Lottie.asset('animations/animation_lkknttjy.json',
+                                  width: 195, height: 195),
+                              kHeight(5),
+                              const Text(
+                                "  No transactions yet !",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        itemCount: snapshot.data!.docs.length,
-                        itemBuilder: (context, index) {
-                          QueryDocumentSnapshot<Object?>? documentSnapshot =
-                              snapshot.data!.docs[index];
-
-                          return Container(
-                            margin: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10),
-                              border: Border.all(
-                                color: Colors.grey.withOpacity(0.5),
-                                width: 1.0,
-                              ),
-                            ),
-                            child: Center(
-                              child: Text(
-                                documentSnapshot['todoTitle'],
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                            ),
-                          );
+                      );
+                    } else {
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const TaskScreen()));
                         },
+                        child: GridView.builder(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 8.0,
+                            mainAxisSpacing: 8.0,
+                            childAspectRatio: 1.2,
+                          ),
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            QueryDocumentSnapshot<Object?>? documentSnapshot =
+                                snapshot.data!.docs[index];
+
+                            return Container(
+                              margin: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  width: 1.0,
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  documentSnapshot['todoTitle'],
+                                  style: const TextStyle(fontSize: 16),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
                       );
                     }
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          Colors.red,
-                        ),
-                      ),
-                    );
                   },
                 )),
           ),
@@ -206,11 +231,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: Column(
                       children: [
                         TextField(
+                          decoration: const InputDecoration(
+                            hintText: 'Description',
+                          ),
                           onChanged: (String value) {
                             title = value;
                           },
                         ),
                         TextField(
+                          decoration: const InputDecoration(
+                            hintText: 'Numbers',
+                          ),
                           onChanged: (String value) {
                             description = value;
                           },

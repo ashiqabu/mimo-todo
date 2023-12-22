@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:todo_list/screens/login.dart';
+import 'package:todo_list/screens/mimo.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -29,22 +30,30 @@ class ProfileScreen extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.notifications),
             title: const Text('Notification'),
-            onTap: () {},
+            onTap: () {
+              navigate(context);
+            },
           ),
           ListTile(
             leading: const Icon(Icons.settings),
             title: const Text('General'),
-            onTap: () {},
+            onTap: () {
+              navigate(context);
+            },
           ),
           ListTile(
             leading: const Icon(Icons.account_circle),
             title: const Text('Account'),
-            onTap: () {},
+            onTap: () {
+              navigate(context);
+            },
           ),
           ListTile(
             leading: const Icon(Icons.info),
             title: const Text('About'),
-            onTap: () {},
+            onTap: () {
+              navigate(context);
+            },
           ),
           ListTile(
             leading: const Icon(Icons.logout),
@@ -67,5 +76,10 @@ class ProfileScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void navigate(BuildContext context) {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => const MimoDemo()));
   }
 }
